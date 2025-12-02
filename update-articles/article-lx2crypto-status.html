@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LX2Crypto 개발 현황 보고 - LX2 블로그</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --main-blue: #2563EB;
+            --light-blue: #3B82F6;
+            --bg-gray: #F5F7FB;
+            --bg-light: #F3F6FA;
+            --text-dark: #1A1A1A;
+            --text-gray: #6B7280;
+            --border-light: #E5E7EB;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --border-color: #E5E7EB;
+            --bg-white: #FFFFFF;
+            --dark-blue: #1E3A8A;
+            --gradient-start: #1E40AF;
+            --gradient-end: #3B82F6;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            background: #FFFFFF;
+            border-right: 1px solid var(--border-light);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .logo-link img {
+            height: 32px;
+            width: auto;
+        }
+
+        .sidebar-nav {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--main-blue);
+        }
+
+        .nav-item.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--main-blue);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 230px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 3rem 4rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            font-size: 1rem;
+            background: #FFFFFF;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--main-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+        }
+
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .article-container {
+                padding: 2rem 1rem;
+            }
+        }
+
+        .article-detail {
+            width: 100%;
+        }
+
+        .article-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .article-header .article-badge {
+            position: static;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .article-header .article-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .article-detail-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1F2937;
+            line-height: 1.3;
+            margin-bottom: 0.75rem;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .article-detail-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        .article-meta {
+            color: #9CA3AF;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+
+        .article-section {
+            margin-bottom: 3rem;
+        }
+
+        .article-section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .article-section h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .article-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .article-section p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .article-section code {
+            background: #F3F4F6;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #1F2937;
+        }
+
+        .article-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .back-button {
+            display: inline-block;
+            color: var(--dark-blue);
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--dark-blue);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--dark-blue);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .toc-container {
+            position: fixed;
+            right: 40px;
+            top: 180px;
+            width: 280px;
+            z-index: 100;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-container {
+                position: relative;
+                right: auto;
+                top: auto;
+                width: 100%;
+                margin-bottom: 3rem;
+            }
+        }
+
+        .table-of-contents {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .toc-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1.5px solid var(--border-color);
+            text-align: left;
+        }
+
+        .toc-nav {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .toc-link {
+            display: block;
+            padding: 0.875rem 1rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 1rem;
+            line-height: 1.6;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .toc-link:hover {
+            background: rgba(30, 58, 138, 0.05);
+            color: var(--dark-blue);
+        }
+
+        .toc-link.active {
+            background: rgba(30, 58, 138, 0.1);
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="../newsroom.html" class="logo-link">
+                    <img src="../assets/logo_lx2.png" alt="LX2 Logo" class="sidebar-logo-img">
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../newsroom.html" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>뉴스룸</span>
+                </a>
+                <a href="../dev-update.html" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>업데이트 정보</span>
+                </a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Search Bar -->
+                <div class="search-container">
+            <div class="search-box">
+                        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="검색">
+                    </div>
+            </div>
+                <div class="article-container">
+                <article class="article-detail">
+                <div class="article-header">
+                    <div style="margin: 2rem 0; text-align: center; width: 100%; height: 500px; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <img src="../assets/tumnails/encryption-architecture.png" alt="LX2Crypto 개발 현황 보고" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    </div>
+                    <h1 class="article-detail-title">LX2Crypto 개발 현황 보고</h1>
+                    <p class="article-meta">2025년 · LX2</p>
+                </div>
+                <section class="article-section" id="section-intro">
+                    <h2>핵심 기능 개발 완료 및 검증 준비 단계 돌입</h2>
+                    <p>LX2는 자체 암호모듈 'LX2Crypto'의 핵심 기능 개발을 완료하고, 본격적인 검증 준비 단계에 돌입했습니다. 이번 보고에서는 SHA2·SHA3 해시함수, HMAC, CMAC 등 주요 암호 알고리즘 모듈의 구현이 완료되었으며, 현재 KISA 및 TTA 검증 절차에 대비한 내부 테스트가 진행 중입니다.</p>
+                </section>
+                <section class="article-section" id="section-implementation">
+                    <h2>주요 구현 내용</h2>
+                    <h3>SHA2 / SHA3 해시함수</h3>
+                    <p>데이터 무결성 검증 및 암호화 키 관리에 사용되는 국제표준 알고리즘을 적용했습니다. 이를 통해 LX2Crypto는 보다 강력한 암호화 기반을 확보했습니다.</p>
+                    <h3>HMAC (Hash-based Message Authentication Code)</h3>
+                    <p>메시지 인증 및 전송 무결성 검증 기능을 구현하여, 통신 구간에서 발생할 수 있는 데이터 변조를 방지합니다.</p>
+                    <h3>CMAC (Cipher-based Message Authentication Code)</h3>
+                    <p>대칭키 암호 기반의 인증 모듈로, 시스템 내부 데이터의 무결성을 보장합니다.</p>
+                </section>
+                <section class="article-section" id="section-verification">
+                    <h2>검증 절차 대비</h2>
+                    <p>LX2는 이번 모듈 구현 완료를 바탕으로, KISA(한국인터넷진흥원) 및 TTA(한국정보통신기술협회)의 암호모듈 검증 기준에 부합하도록 내부 검증을 진행하고 있습니다.</p>
+                    <p>검증 과정에서는 암호 알고리즘의 정확성, 성능 효율성, 보안 강도 등이 평가되며, LX2는 이를 통과하여 공공기관 및 기업 환경에서도 신뢰할 수 있는 보안 모듈을 제공할 계획입니다.</p>
+                </section>
+                <section class="article-section" id="section-closing">
+                    <h2>향후 계획 및 통합 방향</h2>
+                    <p>LX2Crypto는 향후 LX2의 전반적인 보안 체계에 통합되어 데이터 보호, 사용자 인증, 세션 관리 등 다양한 영역에서 핵심 역할을 담당하게 될 예정입니다.</p>
+                </section>
+                <div class="article-footer">
+                    <a href="../dev-update.html" class="back-button">← 개발 업데이트로 돌아가기</a>
+                </div>
+                </article>
+                </div>
+
+                <div class="toc-container">
+                <aside class="table-of-contents">
+                    <div class="toc-header">
+                        <h3>목차</h3>
+                    </div>
+                    <nav class="toc-nav">
+                        <a href="#section-intro" class="toc-link">핵심 기능 개발 완료 및 검증 준비</a>
+                        <a href="#section-implementation" class="toc-link">주요 구현 내용</a>
+                        <a href="#section-verification" class="toc-link">검증 절차 대비</a>
+                        <a href="#section-closing" class="toc-link">향후 계획 및 통합 방향</a>
+                    </nav>
+                </aside>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../articles-data.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        // 목차 링크 활성화
+        document.addEventListener('DOMContentLoaded', function() {
+            const tocLinks = document.querySelectorAll('.toc-link');
+            const sections = document.querySelectorAll('.article-section');
+            
+            function updateActiveTOC() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (window.pageYOffset >= (sectionTop - 200)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                tocLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            // 스크롤 이벤트
+            window.addEventListener('scroll', updateActiveTOC);
+            
+            // 초기 활성화
+            updateActiveTOC();
+            
+            // 목차 링크 클릭 시 스무스 스크롤
+            tocLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 중심 UI 개선 - LX2 블로그</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --main-blue: #2563EB;
+            --light-blue: #3B82F6;
+            --bg-gray: #F5F7FB;
+            --bg-light: #F3F6FA;
+            --text-dark: #1A1A1A;
+            --text-gray: #6B7280;
+            --border-light: #E5E7EB;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --border-color: #E5E7EB;
+            --bg-white: #FFFFFF;
+            --dark-blue: #1E3A8A;
+            --gradient-start: #1E40AF;
+            --gradient-end: #3B82F6;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            background: #FFFFFF;
+            border-right: 1px solid var(--border-light);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .logo-link img {
+            height: 32px;
+            width: auto;
+        }
+
+        .sidebar-nav {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--main-blue);
+        }
+
+        .nav-item.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--main-blue);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 230px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 3rem 4rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            font-size: 1rem;
+            background: #FFFFFF;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--main-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+        }
+
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .article-container {
+                padding: 2rem 1rem;
+            }
+        }
+
+        .article-detail {
+            width: 100%;
+        }
+
+        .article-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .article-header .article-badge {
+            position: static;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .article-header .article-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .article-detail-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1F2937;
+            line-height: 1.3;
+            margin-bottom: 0.75rem;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .article-detail-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        .article-meta {
+            color: #9CA3AF;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+
+        .article-section {
+            margin-bottom: 3rem;
+        }
+
+        .article-section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .article-section h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .article-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .article-section p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .article-section code {
+            background: #F3F4F6;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #1F2937;
+        }
+
+        .article-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .back-button {
+            display: inline-block;
+            color: var(--dark-blue);
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--dark-blue);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--dark-blue);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .toc-container {
+            position: fixed;
+            right: 40px;
+            top: 180px;
+            width: 280px;
+            z-index: 100;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-container {
+                position: relative;
+                right: auto;
+                top: auto;
+                width: 100%;
+                margin-bottom: 3rem;
+            }
+        }
+
+        .table-of-contents {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .toc-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1.5px solid var(--border-color);
+            text-align: left;
+        }
+
+        .toc-nav {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .toc-link {
+            display: block;
+            padding: 0.875rem 1rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 1rem;
+            line-height: 1.6;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .toc-link:hover {
+            background: rgba(30, 58, 138, 0.05);
+            color: var(--dark-blue);
+        }
+
+        .toc-link.active {
+            background: rgba(30, 58, 138, 0.1);
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="../newsroom.html" class="logo-link">
+                    <img src="../assets/logo_lx2.png" alt="LX2 Logo" class="sidebar-logo-img">
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../newsroom.html" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>뉴스룸</span>
+                </a>
+                <a href="../dev-update.html" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>업데이트 정보</span>
+                </a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Search Bar -->
+                <div class="search-container">
+            <div class="search-box">
+                        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="검색">
+                    </div>
+            </div>
+                <div class="article-container">
+                <article class="article-detail">
+                <div class="article-header">
+                    <div style="margin: 2rem 0; text-align: center; width: 100%; height: 500px; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <img src="../assets/tumnails/user-convenience.png" alt="사용자 중심 UI 개선" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    </div>
+                    <h1 class="article-detail-title">사용자 중심 UI 개선</h1>
+                    <p class="article-meta">2025년 5월 · LX2</p>
+                </div>
+                <section class="article-section" id="section-intro">
+                    <h2>사용자 경험 향상을 위한 단계적 개선</h2>
+                    <p>LX2는 사용자 경험 향상을 위해 홈페이지와 학습관리 화면 전반의 UI를 단계적으로 개선했습니다. 홈페이지 하단 구조 개편부터 팝업 정렬 기능, 과정 공유 기능 강화까지 폭넓게 진행되었습니다.</p>
+                </section>
+                <section class="article-section" id="section-footer">
+                    <h2>홈페이지 하단(UI Footer) 리뉴얼</h2>
+                    <p style="font-size: 0.9rem; color: #999;">2025년 5월 7일 ~ 14일</p>
+                    <h3>완전히 새로워진 홈페이지 하단</h3>
+                    <p>5월 초부터 중순까지 진행된 리뉴얼을 통해 홈페이지 하단 구조(UI Footer)가 완전히 새로워졌습니다. 기존의 단순 정보 중심 구성에서 벗어나, 사용자 중심의 다양한 기능이 추가되었습니다.</p>
+                    <h3>주요 개선 사항</h3>
+                    <p>'사용방법' 버튼 추가 - 사용자가 LX2 매뉴얼과 가이드에 쉽게 접근할 수 있습니다.</p>
+                    <p>공식 블로그·인스타그램 연동 - SNS 콘텐츠와 소식에 빠르게 접근할 수 있습니다.</p>
+                    <p>하단 배너 디자인 개선 - 브랜드 정체성과 시각적 통일성이 강화되었습니다.</p>
+                </section>
+                <section class="article-section" id="section-popup">
+                    <h2>팝업 자동 정렬 기능 요청</h2>
+                    <p style="font-size: 0.9rem; color: #999;">2025년 5월 21일</p>
+                    <h3>효율적인 팝업 관리</h3>
+                    <p>기존에는 관리자 화면에서 팝업을 등록할 때 X, Y 좌표를 직접 입력해야 했습니다. 이로 인해 팝업 위치 관리가 번거로웠던 문제를 해결하기 위해 타일형·계층형 자동 정렬 방식으로 개선 요청이 이루어졌습니다.</p>
+                    <p>기존 방식: X, Y 좌표 수동 입력, 위치 겹침 가능성, 매번 수정 필요</p>
+                    <p>개선 방향: 타일형 자동 정렬, 계층형 겹침 구조, 편리한 관리</p>
+                </section>
+                <section class="article-section" id="section-qr">
+                    <h2>과정 공유 QR 생성 기능 개발</h2>
+                    <p style="font-size: 0.9rem; color: #999;">2025년 5월 30일</p>
+                    <h3>빠르고 쉬운 과정 공유</h3>
+                    <p>LX2에 등록된 과정을 쉽게 공유하고 홍보할 수 있도록 과정 공유 QR 코드 생성 기능이 개발되었습니다. 운영자는 과정별 전용 QR 코드를 생성하고, 이를 포스터, 브로슈어, 웹사이트 등 다양한 홍보 자료에 활용할 수 있습니다.</p>
+                    <p>사용자는 QR 코드를 스캔하는 것만으로 바로 과정 상세 페이지로 이동하여, 과정 정보를 확인하고 수강신청까지 진행할 수 있습니다.</p>
+                </section>
+                <section class="article-section" id="section-closing">
+                    <h2>지속적인 사용자 중심 개선</h2>
+                    <p>LX2의 UI 개선은 단순히 화면을 바꾸는 것이 아닙니다. 사용자의 실제 불편함을 파악하고, 그에 맞는 해결책을 설계하여 경험 전반을 개선하는 과정입니다.</p>
+                    <p>LX2는 앞으로도 사용자 중심의 디자인 철학을 바탕으로, 작지만 의미 있는 개선을 지속적으로 이어갈 예정입니다.</p>
+                </section>
+                <div class="article-footer">
+                    <a href="../dev-update.html" class="back-button">← 개발 업데이트로 돌아가기</a>
+                </div>
+                </article>
+                </div>
+
+                <div class="toc-container">
+                <aside class="table-of-contents">
+                    <div class="toc-header">
+                        <h3>목차</h3>
+                    </div>
+                    <nav class="toc-nav">
+                        <a href="#section-intro" class="toc-link">사용자 경험 향상을 위한 단계적 개선</a>
+                        <a href="#section-footer" class="toc-link">홈페이지 하단(UI Footer) 리뉴얼</a>
+                        <a href="#section-popup" class="toc-link">팝업 자동 정렬 기능 요청</a>
+                        <a href="#section-qr" class="toc-link">과정 공유 QR 생성 기능 개발</a>
+                    </nav>
+                </aside>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../articles-data.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        // 목차 링크 활성화
+        document.addEventListener('DOMContentLoaded', function() {
+            const tocLinks = document.querySelectorAll('.toc-link');
+            const sections = document.querySelectorAll('.article-section');
+            
+            function updateActiveTOC() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (window.pageYOffset >= (sectionTop - 200)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                tocLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            // 스크롤 이벤트
+            window.addEventListener('scroll', updateActiveTOC);
+            
+            // 초기 활성화
+            updateActiveTOC();
+            
+            // 목차 링크 클릭 시 스무스 스크롤
+            tocLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

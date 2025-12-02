@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통합검색 및 홍보영상 기능 강화 - LX2 블로그</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --main-blue: #2563EB;
+            --light-blue: #3B82F6;
+            --bg-gray: #F5F7FB;
+            --bg-light: #F3F6FA;
+            --text-dark: #1A1A1A;
+            --text-gray: #6B7280;
+            --border-light: #E5E7EB;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --border-color: #E5E7EB;
+            --bg-white: #FFFFFF;
+            --dark-blue: #1E3A8A;
+            --gradient-start: #1E40AF;
+            --gradient-end: #3B82F6;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            background: #FFFFFF;
+            border-right: 1px solid var(--border-light);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .logo-link img {
+            height: 32px;
+            width: auto;
+        }
+
+        .sidebar-nav {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--main-blue);
+        }
+
+        .nav-item.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--main-blue);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 230px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 3rem 4rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            font-size: 1rem;
+            background: #FFFFFF;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--main-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+        }
+
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .article-container {
+                padding: 2rem 1rem;
+            }
+        }
+
+        .article-detail {
+            width: 100%;
+        }
+
+        .article-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .article-header .article-badge {
+            position: static;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .article-header .article-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .article-detail-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1F2937;
+            line-height: 1.3;
+            margin-bottom: 0.75rem;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .article-detail-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        .article-meta {
+            color: #9CA3AF;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+
+        .article-section {
+            margin-bottom: 3rem;
+        }
+
+        .article-section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .article-section h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .article-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .article-section p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .article-section code {
+            background: #F3F4F6;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #1F2937;
+        }
+
+        .article-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .back-button {
+            display: inline-block;
+            color: var(--dark-blue);
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--dark-blue);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--dark-blue);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .toc-container {
+            position: fixed;
+            right: 40px;
+            top: 180px;
+            width: 280px;
+            z-index: 100;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-container {
+                position: relative;
+                right: auto;
+                top: auto;
+                width: 100%;
+                margin-bottom: 3rem;
+            }
+        }
+
+        .table-of-contents {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .toc-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1.5px solid var(--border-color);
+            text-align: left;
+        }
+
+        .toc-nav {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .toc-link {
+            display: block;
+            padding: 0.875rem 1rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 1rem;
+            line-height: 1.6;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .toc-link:hover {
+            background: rgba(30, 58, 138, 0.05);
+            color: var(--dark-blue);
+        }
+
+        .toc-link.active {
+            background: rgba(30, 58, 138, 0.1);
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="../newsroom.html" class="logo-link">
+                    <img src="../assets/logo_lx2.png" alt="LX2 Logo" class="sidebar-logo-img">
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../newsroom.html" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>뉴스룸</span>
+                </a>
+                <a href="../dev-update.html" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>업데이트 정보</span>
+                </a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Search Bar -->
+                <div class="search-container">
+            <div class="search-box">
+                        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="검색">
+                    </div>
+            </div>
+                <div class="article-container">
+                <article class="article-detail">
+                <div class="article-header">
+                    <div style="margin: 2rem 0; text-align: center; width: 100%; height: 500px; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <img src="../assets/tumnails/integrated-search.png" alt="통합검색 및 홍보영상 기능 강화" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    </div>
+                    <h1 class="article-detail-title">통합검색 및 홍보영상 기능 강화</h1>
+                    <p class="article-meta">2025년 11월 · LX2</p>
+                </div>
+                <section class="article-section" id="section-intro">
+                    <h2>사용자 접근성과 시각적 완성도를 높이다</h2>
+                    <p>LX2는 사용자 접근성과 시각적 완성도를 높이기 위해 통합검색 시스템과 홍보영상 기능을 전면 강화했습니다. 이번 업데이트는 검색 품질 향상과 콘텐츠 홍보 기능 개선을 중심으로 플랫폼 전반의 사용자 경험(UX)을 개선하는 것을 목표로 진행되었습니다.</p>
+                </section>
+                <section class="article-section" id="section-search">
+                    <h2>통합검색 기능 정식 반영</h2>
+                    <p style="font-size: 0.9rem; color: #999;">2025년 11월 1일</p>
+                    <p>통합검색 기능이 LX2 주요 템플릿에 정식 반영되었습니다. 이번 개편에서는 추천검색 기능이 추가되어 사용자가 입력한 키워드와 관련된 콘텐츠를 즉시 제안받을 수 있습니다.</p>
+                    <p>검색 인터페이스가 일관된 디자인으로 통일되어 기관별 사이트에서도 동일한 검색 경험을 제공합니다.</p>
+                </section>
+                <section class="article-section" id="section-ui-fix">
+                    <h2>UI 오류 수정 및 시안별 점검</h2>
+                    <p style="font-size: 0.9rem; color: #999;">2025년 11월 6일</p>
+                    <p>통합검색 기능 반영 이후, 템플릿별 UI 차이를 점검하며 시안별 오류 수정 작업이 진행되었습니다.</p>
+                    <h3>주요 수정 내역</h3>
+                    <p><strong>추천검색 결과 미출력 문제 해결</strong> - 검색어 입력 시 추천 결과가 정상적으로 표시되도록 개선</p>
+                    <p><strong>배너 링크 누락 문제 해결</strong> - 배너 클릭 시 올바른 페이지로 이동하도록 링크 복구</p>
+                    <p><strong>영상 미리보기 오류 수정</strong> - 영상 썸네일과 재생 기능이 정상 작동하도록 개선</p>
+                    <p>세부적인 문제를 확인하고 즉시 개선하여 안정적인 서비스 품질을 확보했습니다.</p>
+                </section>
+                <section class="article-section" id="section-video">
+                    <h2>홍보영상 기능 강화</h2>
+                    <p style="font-size: 0.9rem; color: #999;">2025년 11월 6일 ~ 7일</p>
+                    <h3>비메오 홍보영상 계정 공유</h3>
+                    <p>LX2 홍보영상을 통합 관리하기 위해 비메오(Vimeo) 전용 계정이 운영 환경에 공유되었습니다. 이를 통해 영상 업로드, 배너 연동, 팝업 재생 등 각 페이지에서 동일한 계정으로 콘텐츠를 관리할 수 있습니다.</p>
+                    <h3>GLightbox 기반 팝업 적용</h3>
+                    <p>홍보영상 배너에는 GLightbox 기반의 영상 팝업 구조가 새롭게 적용되었습니다. 사용자가 배너를 클릭하면, 전체화면 팝업으로 즉시 영상 재생이 가능하도록 개선되었습니다.</p>
+                    <p>공통 CSS/JS 구조 추가로 모든 템플릿에서 동일한 기능을 사용할 수 있으며, 템플릿-A '강의영상 한 컷' 영역에도 동일한 팝업 구조가 확장 적용되었습니다.</p>
+                    <p>이를 통해 LX2는 홍보용 영상 콘텐츠의 노출 효과를 극대화하고, 브랜드 일관성을 유지하면서도 관리 효율성을 높였습니다.</p>
+                </section>
+                <section class="article-section" id="section-closing">
+                    <h2>사용자 경험 품질을 한 단계 향상</h2>
+                    <p>이번 통합검색 및 홍보영상 기능 강화는 LX2의 사용자 경험 품질을 한 단계 향상시킨 업데이트로, 검색 접근성, 콘텐츠 전달력, 시각적 완성도를 모두 개선한 의미 있는 변화입니다.</p>
+                </section>
+                <div class="article-footer">
+                    <a href="../dev-update.html" class="back-button">← 개발 업데이트로 돌아가기</a>
+                </div>
+                </article>
+                </div>
+
+                <div class="toc-container">
+                <aside class="table-of-contents">
+                    <div class="toc-header">
+                        <h3>목차</h3>
+                    </div>
+                    <nav class="toc-nav">
+                        <a href="#section-intro" class="toc-link">사용자 접근성과 시각적 완성도를 높이다</a>
+                        <a href="#section-search" class="toc-link">통합검색 기능 정식 반영</a>
+                        <a href="#section-ui-fix" class="toc-link">UI 오류 수정 및 시안별 점검</a>
+                        <a href="#section-video" class="toc-link">홍보영상 기능 강화</a>
+                    </nav>
+                </aside>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../articles-data.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        // 목차 링크 활성화
+        document.addEventListener('DOMContentLoaded', function() {
+            const tocLinks = document.querySelectorAll('.toc-link');
+            const sections = document.querySelectorAll('.article-section');
+            
+            function updateActiveTOC() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (window.pageYOffset >= (sectionTop - 200)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                tocLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            // 스크롤 이벤트
+            window.addEventListener('scroll', updateActiveTOC);
+            
+            // 초기 활성화
+            updateActiveTOC();
+            
+            // 목차 링크 클릭 시 스무스 스크롤
+            tocLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

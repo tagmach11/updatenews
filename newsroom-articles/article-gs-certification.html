@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[LX2 학습관리시스템 v2.0] GS인증 1등급 획득 - LX2 블로그</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --main-blue: #2563EB;
+            --light-blue: #3B82F6;
+            --bg-gray: #F5F7FB;
+            --bg-light: #F3F6FA;
+            --text-dark: #1A1A1A;
+            --text-gray: #6B7280;
+            --border-light: #E5E7EB;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --border-color: #E5E7EB;
+            --bg-white: #FFFFFF;
+            --dark-blue: #1E3A8A;
+            --gradient-start: #1E40AF;
+            --gradient-end: #3B82F6;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            background: #FFFFFF;
+            border-right: 1px solid var(--border-light);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .logo-link img {
+            height: 32px;
+            width: auto;
+        }
+
+        .sidebar-nav {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--main-blue);
+        }
+
+        .nav-item.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--main-blue);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 230px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        /* Top Header with Logo */
+        .top-header {
+            background: #FFFFFF;
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .top-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .top-logo img {
+            height: 32px;
+            width: auto;
+        }
+
+        .top-logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--main-blue);
+            letter-spacing: -0.02em;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 3rem 4rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            font-size: 1rem;
+            background: #FFFFFF;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--main-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+        }
+
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .article-container {
+                padding: 2rem 1rem;
+            }
+        }
+
+        .article-detail {
+            width: 100%;
+        }
+
+        .article-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .article-header .article-badge {
+            position: static;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .article-header .article-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .article-badge-ai {
+            background: #8b5cf6 !important;
+        }
+
+        .article-badge-certification {
+            background: #667eea !important;
+        }
+
+        .article-badge-award {
+            background: #f59318 !important;
+        }
+
+        .article-detail-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1F2937;
+            line-height: 1.3;
+            margin-bottom: 0.75rem;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .article-detail-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        .article-meta {
+            color: #9CA3AF;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+
+        .article-image {
+            margin-bottom: 3rem;
+        }
+
+        .article-image img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .article-section {
+            margin-bottom: 3rem;
+        }
+
+        .article-section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .article-section h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .article-section h2 .section-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 1;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-right: 0.75rem;
+            vertical-align: middle;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .article-section h2:hover .section-number {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .article-section p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .article-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .back-button {
+            display: inline-block;
+            color: var(--dark-blue);
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--dark-blue);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--dark-blue);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+
+        .summary-card {
+            background: var(--bg-light);
+            border-left: 4px solid var(--dark-blue);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 3rem;
+        }
+
+        .summary-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-dark);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .problem-box, .solution-box {
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .problem-box {
+            border-left: 4px solid #EF4444;
+        }
+
+        .solution-box {
+            border-left: 4px solid #10B981;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 1.5rem;
+            background: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .feature-item {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        .quote-box {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 2.5rem;
+            border-radius: 12px;
+            color: white;
+            margin: 3rem 0;
+        }
+
+        .quote-text {
+            font-size: 1.15rem;
+            font-style: italic;
+            line-height: 1.8;
+            margin: 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .quote-text {
+                font-size: 1rem;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="../newsroom.html" class="logo-link">
+                    <img src="../assets/logo_lx2.png" alt="LX2 Logo">
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../newsroom.html" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>뉴스룸</span>
+                </a>
+                <a href="../dev-update.html" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>업데이트 정보</span>
+                </a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Search Bar -->
+                <div class="search-container">
+            <div class="search-box">
+                        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="검색">
+                    </div>
+            </div>
+            
+            <!-- Search Results Container (hidden by default) -->
+            <div id="search-results-container" style="display: none; margin-top: 2rem; max-width: 1200px; margin-left: auto; margin-right: auto; padding: 0 2rem;">
+                <h3 id="search-results-title" style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; color: #1a1a1a;"></h3>
+                <div id="search-results-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;"></div>
+            </div>
+            
+                <div id="article-content-wrapper" class="article-container">
+                <!-- Article Header -->
+                <article class="article-detail">
+                <div class="article-header">
+                    <div style="margin: 2rem 0; text-align: center; width: 100%; height: 500px; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <img src="../assets/newsroom/gs-certification.png" alt="GS인증 1등급 획득" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    </div>
+                    <h1 class="article-detail-title">LX2 학습관리시스템 v2.0, GS인증 1등급 획득</h1>
+                    <p class="article-meta">2025년 9월 12일 · 포씨소프트</p>
+                </div>
+
+                <section class="article-section" id="section-intro">
+                    <p style="font-size: 1.05rem; line-height: 1.8; color: #333; font-weight: 600; margin-bottom: 1.5rem;">한국정보통신기술협회(TTA) 주관 'GS(Good Software) 인증' 최고 등급인 1등급 획득</p>
+                    <p style="font-size: 1.05rem; line-height: 1.8; color: #333; font-weight: 600; margin-bottom: 2rem;">기능성·성능 효율성·사용성·신뢰성·유지보수성·이식성 6개 항목 모두 우수 평가</p>
+                </section>
+
+                <section class="article-section" id="section-content">
+                    <p>[2025.09.12] ㈜포씨소프트(대표 배정훈)는 자사 대표 제품인 'LX2 학습관리시스템 v2.0'이 한국정보통신기술협회(TTA)가 주관하는 'GS(Good Software) 인증'에서 최고 등급인 1등급을 획득했다고 12일 밝혔습니다.</p>
+                    
+                    <p>'GS 인증'은 한국정보통신기술협회(TTA)가 주관하는 국가 공인 소프트웨어 품질 인증 제도로, 소프트웨어 제품의 품질을 객관적이고 과학적으로 평가하여 우수한 제품에 대해 인증을 부여합니다. 기능성, 성능 효율성, 사용성, 신뢰성, 유지보수성, 이식성 등 6개 항목에 대해 소프트웨어 품질을 종합적으로 평가합니다.</p>
+                    
+                    <p>LX2 학습관리시스템 v2.0은 위 6개 평가 항목 모두에서 우수한 성적을 거두며 최고 등급인 1등급을 획득했습니다. 이는 공공기관과 기업 교육 시장에서의 신뢰성과 품질 경쟁력을 공식적으로 인정받은 것입니다.</p>
+                    
+                    <p>LX2는 교육기관과 기업 맞춤형 학습환경 구축을 위한 통합 학습관리시스템으로, AI 기반 학습 분석, 자동화된 과정 운영, 대량접속 제어, 다국어 지원 등 첨단 기능을 통해 효율적이고 안정적인 교육 운영을 지원합니다.</p>
+                    
+                    <p>배정훈 대표는 "LX2의 GS 1등급 획득은 기술력뿐 아니라 철저한 품질 관리 체계를 인정받은 결과"라며, "앞으로도 교육 산업의 디지털 혁신을 이끄는 신뢰할 수 있는 파트너로 성장해 나가겠다"고 말했습니다.</p>
+                    
+                    <p>㈜포씨소프트는 이번 인증을 계기로 지속적인 기술 고도화와 품질 개선을 추진해, 고객사에 보다 안정적이고 검증된 학습환경을 제공할 계획입니다. GS 인증 1등급을 획득한 LX2 학습관리시스템은 이제 단순한 교육 플랫폼을 넘어, 국가가 인정한 신뢰할 수 있는 교육 인프라로 자리매김했습니다.</p>
+                </section>
+
+                <!-- Back Button -->
+                <div class="article-footer">
+                    <a href="../newsroom.html" class="back-button">← 뉴스룸으로 돌아가기</a>
+                </div>
+                </article>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../articles-data.js"></script>
+    <script src="../script.js"></script>
+    <script>
+    </script>
+    <script>
+        // Search functionality for article pages
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('.search-input');
+            const articleContentWrapper = document.getElementById('article-content-wrapper');
+            const searchResultsContainer = document.getElementById('search-results-container');
+            const searchResultsGrid = document.getElementById('search-results-grid');
+            const searchResultsTitle = document.getElementById('search-results-title');
+            
+            // 뉴스룸 아티클 데이터
+            const newsroomArticles = [
+                {
+                    title: '신SW상품대상 멀티미디어&서비스SW 부문 수상',
+                    description: '과학기술정보통신부 주최, 전자신문 주관 \'2025년 6월 신SW상품대상\' 멀티미디어&서비스SW 부문 수상. AI 기반 맞춤형 학습관리시스템으로 교육 프로세스 일원화를 실현했습니다.',
+                    date: '2025년 6월',
+                    category: '수상',
+                    image: '../assets/newsroom/sw-award.png',
+                    link: 'article-sw-competition.html',
+                    searchText: '신SW상품대상 멀티미디어 서비스SW 부문 수상 과학기술정보통신부 전자신문 2025년 6월 AI 기반 맞춤형 학습관리시스템 교육 프로세스 일원화'
+                },
+                {
+                    title: 'AI 다국어 학생 상담 기능',
+                    description: 'AI 기반 다국어 학생 상담 기능을 제공합니다.',
+                    date: '2025년 8월 14일',
+                    category: 'AI 기능',
+                    image: '../assets/newsroom/student-counseling.png',
+                    link: 'article-ai-counseling.html',
+                    searchText: 'AI 다국어 학생 상담 기능 2025년 8월 14일'
+                },
+                {
+                    title: 'GS인증 1등급 획득',
+                    description: 'GS인증 1등급을 획득했습니다.',
+                    date: '2025년 9월 12일',
+                    category: '인증',
+                    image: '../assets/newsroom/gs-certification.png',
+                    link: 'article-gs-certification.html',
+                    searchText: 'GS인증 1등급 획득 인증 2025년 9월 12일'
+                },
+                {
+                    title: 'AI 다국어 학습 문의·답변 기능',
+                    description: 'AI 기반 다국어 학습 문의 및 답변 기능을 제공합니다.',
+                    date: '2025년 8월 14일',
+                    category: 'AI 기능',
+                    image: '../assets/newsroom/multilingual-qa.png',
+                    link: 'article-ai-multilingual-qa-news.html',
+                    searchText: 'AI 다국어 학습 문의 답변 기능 2025년 8월 14일'
+                },
+                {
+                    title: '벤처기업혁신상 수상',
+                    description: '벤처기업혁신상을 수상했습니다.',
+                    date: '2024년',
+                    category: '수상',
+                    image: '../assets/newsroom/venture-award.png',
+                    link: 'article-sw-award.html',
+                    searchText: '벤처기업혁신상 수상 2024년'
+                }
+            ];
+            
+            // 업데이트 정보 데이터
+            const updateArticles = [
+                {
+                    title: '강의실 UI/UX 업그레이드',
+                    description: 'AI 학습지원 · 다크모드 · 보드형 UI',
+                    date: '',
+                    category: 'UI/UX',
+                    image: '../assets/updateimage/classroom-ui-ux-renewal.png',
+                    link: '../update-articles/article-classroom-renewal.html',
+                    searchText: '강의실 UI UX 업그레이드 AI 학습지원 다크모드 보드형 UI 디자인 학습환경'
+                },
+                {
+                    title: '검색엔진 전면 개편',
+                    description: '학습데이터 API · OpenSearch 엔진 전환',
+                    date: '',
+                    category: '검색',
+                    image: '../assets/updateimage/search-engine-renewal.png',
+                    link: '../update-articles/article-data-search-engine.html',
+                    searchText: '검색엔진 전면 개편 학습데이터 API OpenSearch 엔진 전환 데이터 성능개선'
+                },
+                {
+                    title: '보안 체계 고도화',
+                    description: 'KISA 보안약점 · 세션 무결성 · OAuth 인증',
+                    date: '',
+                    category: '보안',
+                    image: '../assets/updateimage/security-enhancement.png',
+                    link: '../update-articles/article-security-enhancement.html',
+                    searchText: '보안 체계 고도화 KISA 보안약점 세션 무결성 OAuth 인증 안정성'
+                },
+                {
+                    title: '사용자 편의성 업데이트',
+                    description: 'Footer 리뉴얼 · 팝업 최적화 · QR 공유',
+                    date: '',
+                    category: 'UX',
+                    image: '../assets/updateimage/user-centered-ui-improvement.png',
+                    link: '../update-articles/article-ui-improvement.html',
+                    searchText: '사용자 편의성 업데이트 Footer 리뉴얼 팝업 최적화 QR 공유 UX 접근성 인터페이스'
+                },
+                {
+                    title: '기관 맞춤 기능 반영',
+                    description: '검색 강화 · 수료증 출력 · OTP 인증',
+                    date: '',
+                    category: '기능확장',
+                    image: '../assets/updateimage/custom-features.png',
+                    link: '../update-articles/article-custom-features.html',
+                    searchText: '기관 맞춤 기능 반영 검색 강화 수료증 출력 OTP 인증 기능확장 운영관리 기관요구'
+                },
+                {
+                    title: '통합검색·홍보영상 기능 강화',
+                    description: '추천검색 · 영상 팝업 · GLightbox 연동',
+                    date: '',
+                    category: '검색',
+                    image: '../assets/updateimage/integrated-search-video-enhancement.png',
+                    link: '../update-articles/article-integrated-search.html',
+                    searchText: '통합검색 홍보영상 기능 강화 추천검색 영상 팝업 GLightbox 연동 미디어 추천기능'
+                },
+                {
+                    title: '암호화 아키텍처 고도화',
+                    description: 'SHA2/SHA3 · HMAC · CMAC 구현 완료',
+                    date: '',
+                    category: '보안',
+                    image: '../assets/updateimage/lx2crypto-development-verification.png',
+                    link: '../update-articles/article-lx2crypto-status.html',
+                    searchText: '암호화 아키텍처 고도화 SHA2 SHA3 HMAC CMAC 구현 완료 보안 암호화 인프라'
+                },
+                {
+                    title: '콘텐츠 관리 자동화',
+                    description: 'Vimeo · YouTube 자동 연동 API',
+                    date: '',
+                    category: '자동화',
+                    image: '../assets/updateimage/content-api-development.png',
+                    link: '../update-articles/article-content-api.html',
+                    searchText: '콘텐츠 관리 자동화 Vimeo YouTube 자동 연동 API 자동화 콘텐츠'
+                },
+                {
+                    title: 'LX2Crypto 검증 준비 진행',
+                    description: 'LX2Crypto V1.0 개발 및 국가 검증 준비',
+                    date: '',
+                    category: '보안',
+                    image: '../assets/updateimage/crypto-module-verification.png',
+                    link: '../update-articles/article-crypto-module.html',
+                    searchText: 'LX2Crypto 검증 준비 진행 LX2Crypto V1.0 개발 국가 검증 준비 보안 검증 암호모듈'
+                }
+            ];
+            
+            // 통합 검색 데이터
+            const allArticles = [...newsroomArticles, ...updateArticles];
+            
+            function createSearchResultCard(article) {
+                const card = document.createElement('article');
+                card.style.cssText = 'background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s; cursor: pointer; border: 1px solid rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 100%;';
+                card.onmouseover = function() { this.style.transform = 'translateY(-4px)'; this.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)'; };
+                card.onmouseout = function() { this.style.transform = 'translateY(0)'; this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'; };
+                
+                const link = document.createElement('a');
+                link.href = article.link;
+                link.style.cssText = 'text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;';
+                
+                const imageDiv = document.createElement('div');
+                imageDiv.style.cssText = 'position: relative; height: 200px; overflow: hidden; background: #f8f9fa;';
+                const img = document.createElement('img');
+                img.src = article.image;
+                img.alt = article.title;
+                img.style.cssText = 'width: 100%; height: 100%; object-fit: cover; display: block;';
+                imageDiv.appendChild(img);
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.style.cssText = 'padding: 1.5rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between;';
+                
+                const categorySpan = document.createElement('span');
+                categorySpan.textContent = article.category;
+                categorySpan.style.cssText = 'color: #8b5cf6; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: inline-block;';
+                
+                const titleH4 = document.createElement('h4');
+                titleH4.textContent = article.title;
+                titleH4.style.cssText = 'font-size: 1rem; font-weight: 600; margin: 0 0 0.75rem 0; color: #1a1a1a; line-height: 1.4;';
+                
+                const descP = document.createElement('p');
+                descP.textContent = article.description;
+                descP.style.cssText = 'font-size: 0.875rem; color: #666; margin: 0 0 1rem 0; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;';
+                
+                contentDiv.appendChild(categorySpan);
+                contentDiv.appendChild(titleH4);
+                contentDiv.appendChild(descP);
+                
+                if (article.date) {
+                    const dateP = document.createElement('p');
+                    dateP.textContent = article.date;
+                    dateP.style.cssText = 'font-size: 0.75rem; color: #999; margin: 0;';
+                    contentDiv.appendChild(dateP);
+                }
+                
+                link.appendChild(imageDiv);
+                link.appendChild(contentDiv);
+                card.appendChild(link);
+                
+                return card;
+            }
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase().trim();
+                    
+                    if (searchTerm === '') {
+                        // 검색어가 없으면 원래 레이아웃 표시
+                        if (articleContentWrapper) articleContentWrapper.style.display = 'block';
+                        if (searchResultsContainer) searchResultsContainer.style.display = 'none';
+                        return;
+                    }
+                    
+                    // 검색 결과 필터링
+                    const filteredResults = allArticles.filter(article => 
+                        article.searchText.toLowerCase().includes(searchTerm) ||
+                        article.title.toLowerCase().includes(searchTerm) ||
+                        article.description.toLowerCase().includes(searchTerm)
+                    );
+                    
+                    // 원래 레이아웃 숨기고 검색 결과 표시
+                    if (articleContentWrapper) articleContentWrapper.style.display = 'none';
+                    if (searchResultsContainer) searchResultsContainer.style.display = 'block';
+                    
+                    // 검색 결과 그리드 초기화
+                    if (searchResultsGrid) searchResultsGrid.innerHTML = '';
+                    
+                    if (filteredResults.length === 0) {
+                        if (searchResultsTitle) {
+                            searchResultsTitle.textContent = '검색 결과가 없습니다.';
+                            searchResultsTitle.style.color = '#999';
+                        }
+                    } else {
+                        if (searchResultsTitle) {
+                            searchResultsTitle.textContent = `전체 검색 결과 (${filteredResults.length}개)`;
+                            searchResultsTitle.style.color = '#1a1a1a';
+                        }
+                        
+                        // 검색 결과 그리드를 항상 3x3으로 고정
+                        if (searchResultsGrid) {
+                            searchResultsGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+                        }
+                        
+                        // 검색 결과 카드 생성
+                        filteredResults.forEach(article => {
+                            const card = createSearchResultCard(article);
+                            if (searchResultsGrid) searchResultsGrid.appendChild(card);
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

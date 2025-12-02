@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자체 암호모듈 검증 추진 - LX2 블로그</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --main-blue: #2563EB;
+            --light-blue: #3B82F6;
+            --bg-gray: #F5F7FB;
+            --bg-light: #F3F6FA;
+            --text-dark: #1A1A1A;
+            --text-gray: #6B7280;
+            --border-light: #E5E7EB;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --border-color: #E5E7EB;
+            --bg-white: #FFFFFF;
+            --dark-blue: #1E3A8A;
+            --gradient-start: #1E40AF;
+            --gradient-end: #3B82F6;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-gray);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .main-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 230px;
+            background: #FFFFFF;
+            border-right: 1px solid var(--border-light);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+
+        .sidebar-logo {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .logo-link img {
+            height: 32px;
+            width: auto;
+        }
+
+        .sidebar-nav {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--main-blue);
+        }
+
+        .nav-item.active {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--main-blue);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 230px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .content-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 3rem 4rem;
+        }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            font-size: 1rem;
+            background: #FFFFFF;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--main-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+        }
+
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .article-container {
+                padding: 2rem 1rem;
+            }
+        }
+
+        .article-detail {
+            width: 100%;
+        }
+
+        .article-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .article-header .article-badge {
+            position: static;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: white;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .article-header .article-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+        }
+
+        .article-detail-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1F2937;
+            line-height: 1.3;
+            margin-bottom: 0.75rem;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .article-detail-title {
+                font-size: 1.75rem;
+            }
+        }
+
+        .article-meta {
+            color: #9CA3AF;
+            font-size: 0.95rem;
+            margin-top: 0;
+        }
+
+        .article-section {
+            margin-bottom: 3rem;
+        }
+
+        .article-section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .article-section h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        .article-section h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .article-section p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+        }
+
+        .article-section code {
+            background: #F3F4F6;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #1F2937;
+        }
+
+        .article-footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .back-button {
+            display: inline-block;
+            color: var(--dark-blue);
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--dark-blue);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: var(--dark-blue);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .toc-container {
+            position: fixed;
+            right: 40px;
+            top: 180px;
+            width: 280px;
+            z-index: 100;
+        }
+
+        @media (max-width: 1024px) {
+            .toc-container {
+                position: relative;
+                right: auto;
+                top: auto;
+                width: 100%;
+                margin-bottom: 3rem;
+            }
+        }
+
+        .table-of-contents {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .toc-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1.5px solid var(--border-color);
+            text-align: left;
+        }
+
+        .toc-nav {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .toc-link {
+            display: block;
+            padding: 0.875rem 1rem;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 1rem;
+            line-height: 1.6;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .toc-link:hover {
+            background: rgba(30, 58, 138, 0.05);
+            color: var(--dark-blue);
+        }
+
+        .toc-link.active {
+            background: rgba(30, 58, 138, 0.1);
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="../newsroom.html" class="logo-link">
+                    <img src="../assets/logo_lx2.png" alt="LX2 Logo" class="sidebar-logo-img">
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../newsroom.html" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>뉴스룸</span>
+                </a>
+                <a href="../dev-update.html" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>업데이트 정보</span>
+                </a>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <div class="content-container">
+                <!-- Search Bar -->
+                <div class="search-container">
+            <div class="search-box">
+                        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" class="search-input" placeholder="검색">
+                    </div>
+            </div>
+                <div class="article-container">
+                <article class="article-detail">
+                <div class="article-header">
+                    <div style="margin: 2rem 0; text-align: center; width: 100%; height: 500px; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                        <img src="../assets/tumnails/verification-preparation.png" alt="자체 암호모듈 검증 추진" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    </div>
+                    <h1 class="article-detail-title">자체 암호모듈 검증 추진</h1>
+                    <p class="article-meta">2025년 7월 11일 · LX2</p>
+                </div>
+
+                <section class="article-section" id="section-intro">
+                    <h2>LX2Crypto V1.0 개발 추진</h2>
+                    <p>LX2는 플랫폼의 보안 경쟁력을 한 단계 끌어올리기 위해 'LX2Crypto V1.0'이라는 자체 암호모듈 개발을 추진했습니다. 이 프로젝트는 공공기관과 기업 환경에서 요구되는 데이터 보호 수준을 내재화하고, 별도의 외부 암호화 솔루션 없이도 안정적인 보안 구조를 확보하기 위한 전략적 조치입니다.</p>
+                </section>
+
+                <section class="article-section" id="section-internal">
+                    <h2>내부 암호화 구조로 전환되는 LX2</h2>
+                    <p>기존 대부분의 학습관리시스템은 데이터베이스(DB) 암호화를 위해 외부 상용 솔루션에 의존해왔습니다. 그러나 이러한 구조는 비용과 유지보수 측면에서 비효율적이며, 시스템 성능 저하와 연동 문제를 야기할 수 있습니다.</p>
+                    <p>LX2는 이러한 한계를 극복하기 위해 시스템 내부에서 암호화·복호화를 직접 수행하는 구조를 도입했습니다. LX2Crypto V1.0은 AES 기반 대칭키 암호화와 SHA 계열 해시 함수를 적용하여 사용자 정보, 학습 이력, 인증 데이터 등 주요 정보를 내부 레벨에서 보호합니다.</p>
+                </section>
+
+                <section class="article-section" id="section-verification">
+                    <h2>국가 암호모듈 검증 대응 구조</h2>
+                    <p>LX2Crypto는 단순한 암호화 기능을 넘어 국가정보원(NIS) 암호모듈 검증제도에 대응 가능한 형태로 설계되었습니다.</p>
+                    <p>SHA2·SHA3 해시 알고리즘, HMAC 메시지 인증, CMAC 블록 암호 인증 등 국제표준 암호 알고리즘을 기반으로 구성되어 있으며, 향후 KISA와 TTA 검증 절차를 거쳐 공공부문 보안요건에도 대응할 수 있도록 준비 중입니다.</p>
+                    <p>이를 통해 LX2는 공공기관 납품 프로젝트에서도 별도 보안 모듈 구매 없이 자체 검증 가능한 보안 인프라를 제공하게 됩니다.</p>
+                </section>
+
+                <section class="article-section" id="section-balance">
+                    <h2>보안과 효율성의 균형</h2>
+                    <p>LX2Crypto V1.0의 가장 큰 특징은 보안성과 효율성의 공존입니다. 내부 암호화를 통해 데이터 처리 과정의 속도를 유지하고, 모듈화 설계로 유지보수와 확장을 용이하게 하며, 클라우드 환경에서도 동일하게 적용되어 멀티테넌시(Multi-Tenancy) 환경의 데이터 격리 보안을 강화합니다.</p>
+                </section>
+
+                <section class="article-section" id="section-roadmap">
+                    <h2>LX2의 보안 로드맵</h2>
+                    <p>LX2는 이번 자체 암호모듈 개발을 시작으로, 플랫폼 전반에 걸친 보안 체계 고도화 로드맵을 본격화할 예정입니다.</p>
+                    <p>OTP 이중 인증, 세션 무결성 강화, 관리자 접근제어 고도화, 통합 보안 모니터링 등의 조치를 통해 신뢰 가능한 학습관리시스템(LMS)을 위한 핵심 기반을 마련할 것입니다.</p>
+                </section>
+
+
+                <div class="article-footer">
+                    <a href="../dev-update.html" class="back-button">← 개발 업데이트로 돌아가기</a>
+                </div>
+                </article>
+                </div>
+
+                <div class="toc-container">
+                <aside class="table-of-contents">
+                    <div class="toc-header">
+                        <h3>목차</h3>
+                    </div>
+                    <nav class="toc-nav">
+                        <a href="#section-intro" class="toc-link">LX2Crypto V1.0 개발 추진</a>
+                        <a href="#section-internal" class="toc-link">내부 암호화 구조로 전환</a>
+                        <a href="#section-verification" class="toc-link">국가 암호모듈 검증 대응</a>
+                        <a href="#section-balance" class="toc-link">보안과 효율성의 균형</a>
+                        <a href="#section-roadmap" class="toc-link">LX2의 보안 로드맵</a>
+                    </nav>
+                </aside>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="../articles-data.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        // 목차 링크 활성화
+        document.addEventListener('DOMContentLoaded', function() {
+            const tocLinks = document.querySelectorAll('.toc-link');
+            const sections = document.querySelectorAll('.article-section');
+            
+            function updateActiveTOC() {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (window.pageYOffset >= (sectionTop - 200)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                tocLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            // 스크롤 이벤트
+            window.addEventListener('scroll', updateActiveTOC);
+            
+            // 초기 활성화
+            updateActiveTOC();
+            
+            // 목차 링크 클릭 시 스무스 스크롤
+            tocLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
